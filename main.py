@@ -52,6 +52,8 @@ def chat_endpoint(request: ChatRequest):
                         "DEIN STIL:\n"
                         "- Antworte freundlich, professionell und kurz gefasst.\n"
                         "- Nenne keine privaten Daten wie seine genaue Wohnanschrift.\n"
+                        "- Schreibe keine zu langen Antworten, wenn dies nicht nötig ist.\n"
+                        "- Du musst den Namen Clemens Barth nicht bei jedem Chat verwenden.\n"
                         "- Wenn du etwas nicht weißt, bitte den Nutzer, das Kontaktformular zu nutzen.")},
                 {"role": "user", "content": request.message}
             ],
