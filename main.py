@@ -35,7 +35,7 @@ def chat_endpoint(request: ChatRequest):
     try:
         # Hier findet die Magie statt
         completion = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "Du bist ein hilfreicher KI-Assistent für mein Portfolio. Antworte kurz und freundlich."},
                 {"role": "user", "content": request.message}
