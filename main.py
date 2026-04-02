@@ -6,42 +6,42 @@ from groq import Groq
 
 app = FastAPI()
 
-# CORS erlauben, damit dein Framer-Widget auf das Backend zugreifen darf
+# WICHTIG: Erlaubt deiner Website den Zugriff
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In Produktion hier deine Domain eintragen
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Groq Client initialisieren (Der API Key kommt später in die Render-Einstellungen)
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+# Initialisierung des KI-Clients
+api_key = os.environ.get("GROQ_API_KEY")
+client = Groq(api_key=api_key)
 
 class ChatRequest(BaseModel):
     message: str
     session_id: str
 
+@app.get("/")
+def home():
+    return {"status": "online", "message": "Backend ist bereit!"}
+
 @app.post("/chat")
-async def chat_endpoint(request: ChatRequest):
+def chat_endpoint(request: ChatRequest):
+    if not api_key:
+        raise HTTPException(status_code=500, detail="API Key fehlt in Render Einstellungen!")
+    
     try:
+        # Hier findet die Magie statt
         completion = client.chat.completions.create(
-            model="llama3-8b-8192", # Ein schnelles, kostenloses Modell
+            model="llama3-8b-8192",
             messages=[
-                {
-                    "role": "system",
-                    "content": "Du bist der Assistent von [Dein Name]. Antworte höflich, professionell und auf Deutsch. Branding: [Dein Stil, z.B. locker/seriös]."
-                },
+                {"role": "system", "content": "Du bist ein hilfreicher KI-Assistent für mein Portfolio. Antworte kurz und freundlich."},
                 {"role": "user", "content": request.message}
             ],
-            temperature=0.7,
-            max_tokens=1024,
         )
-        
         return {"reply": completion.choices[0].message.content}
     except Exception as e:
+        print(f"Fehler: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
